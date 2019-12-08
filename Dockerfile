@@ -6,6 +6,7 @@ FROM golang:1.12-alpine as builder
 
 RUN apk add git
 RUN apk add make
+RUN apk add bash
 
 RUN mkdir -p /opt/gobetween
 WORKDIR /opt/gobetween
@@ -23,16 +24,8 @@ COPY . .
 
 RUN make build-static
 
-# --------------------- final image --------------------- #
 
-FROM $BASE_IMAGE
-
-WORKDIR /
-
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=builder /opt/gobetween/bin/gobetween  .
-
-CMD ["/gobetween", "-c", "/etc/gobetween/conf/gobetween.toml"]
+CMD ["/opt/gobetween/bin/gobetween", "-c", "/etc/gobetween/conf/gobetween.toml"]
 
 LABEL org.label-schema.vendor="gobetween" \
       org.label-schema.url="http://gobetween.io" \
